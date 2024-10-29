@@ -131,7 +131,7 @@
 
         function loadVoices() {
             voices = synth.getVoices();
-            indonesianVoice = voices.find(voice => voice.lang === "id-ID");
+            indonesianVoice = voices.find(voice => voice.lang === "id-ID") || voices[0];
         }
 
         if (speechSynthesis.onvoiceschanged !== undefined) {
@@ -139,17 +139,20 @@
         }
 
         function talk(word) {
-            if (textToSpeechActive && indonesianVoice) {
+            if (textToSpeechActive) {
                 synth.cancel();
                 let speech = new SpeechSynthesisUtterance();
-                speech.lang = "id-ID";
+                if (indonesianVoice) {
+                speech.lang = indonesianVoice.lang; // Gunakan suara bahasa Indonesia jika tersedia
                 speech.voice = indonesianVoice;
+                } else {
+                    speech.lang = voices[0].lang; // Fallback ke bahasa default
+                    speech.voice = voices[0];
+                }
                 speech.pitch = 1;
                 speech.rate = 1;
                 speech.text = word;
                 synth.speak(speech);
-            } else if (!indonesianVoice) {
-                alert("Voice in Indonesian language is not available.");
             }
         }
 
